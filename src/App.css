@@ -1,0 +1,110 @@
+.Card {
+  width: 600px;
+  height: 260px;
+  background: var(--card-background);
+  border: 12px solid var(--border-color);
+  padding: 32px 96px;
+  text-align: center;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: cardEntrance 0.35s ease-out forwards;
+}
+
+@keyframes cardEntrance {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.Card h1 {
+  margin: 0 0 4px;
+  font-weight: 900;
+  font-size: 2.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #111;
+}
+
+.Card .subtitle {
+  margin: 0;
+  font-weight: 400;
+  color: var(--muted-text);
+  font-size: 1.125rem;
+}
+
+.dots {
+  display: flex;
+  gap: 10px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  animation: wave 1.2s ease-in-out infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes wave {
+  0%, 60%, 100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+.retry-btn {
+  font-family: 'Zain', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  padding: 12px 56px;
+  background: var(--accent-color);
+  color: white;
+  border: 3px solid #111;
+  cursor: pointer;
+  margin-top: auto;
+  transition: opacity 0.15s ease;
+}
+
+.retry-btn:hover {
+  opacity: 0.8;
+}
+
+.footer {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}

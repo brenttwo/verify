@@ -1,6 +1,56 @@
+@font-face {
+  font-family: 'Zain';
+  src: url('/fonts/Zain-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Zain';
+  src: url('/fonts/Zain-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Zain';
+  src: url('/fonts/Zain-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Zain';
+  src: url('/fonts/Zain-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Zain';
+  src: url('/fonts/Zain-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
 :root {
   --background-color: #4C6AFF;
+  --card-background: #D8E6FF;
+  --border-color: #000;
   --text-color: #0A1218;
-  --border-color: #AEFFF2;
-  --button-background: #EBF9FF;
+  --accent-color: #4C6AFF;
+  --muted-text: #4a5a6a;
+  --success-color: #22c55e;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Zain', sans-serif;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 100vh;
 }
