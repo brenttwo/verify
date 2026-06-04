@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { supabase } from './utils/supabase'
 
 function App() {
-  const [step, setStep] = useState<'ip' | 'discord' | 'done' | 'failed'>('ip')
+  const [step, setStep] = useState<'ip' | 'working' | 'done' | 'failed'>('ip')
   const [ip, setIp] = useState('')
 
   useEffect(() => {
@@ -11,10 +12,33 @@ function App() {
       .then(r => r.json())
       .then(d => {
         setIp(d.ip)
-        setStep('discord')
+        setStep('working')
       })
-      .catch(() => setStep('discord'))
+      .catch(() => setStep('failed'))
   }, [step])
+
+  useEffect(() => {
+    if (step !== 'working') return
+
+    const token = new URLSearchParams(location.search).get('token')
+    if (!token) {
+      setStep('failed')
+      return
+    }
+
+    supabase
+      .from('verification_tokens')
+      .update({ ip, verified: true })
+      .eq('token', token)
+      .eq('verified', false)
+      .then(({ error }) => {
+        if (error) {
+          setStep('failed')
+        } else {
+          setStep('done')
+        }
+      })
+  }, [step, ip])
 
   return (
     <>
@@ -22,29 +46,29 @@ function App() {
         <div className="card-content">
           {step === 'ip' && (
             <>
-              <h1>Verifying</h1>
-              <p className="subtitle">Checking your connection...</p>
+              <h1>Grabbing your ip</h1>
+              <p className="subtitle">You can request to delete this. We never sell your data cause</p>
             </>
           )}
-          {step === 'discord' && (
+          {step === 'working' && (
             <>
-              <h1>Verify your Discord</h1>
-              <p className="subtitle">TODO: implement Discord verification</p>
+              <h1>Verifying you rn</h1>
+              <p className="subtitle">hold on</p>
             </>
           )}
           {step === 'failed' && (
             <>
               <h1>Verification failed</h1>
-              <p className="subtitle">Could not verify your Discord account</p>
+              <p className="subtitle">Failed to verify, dm the server owner or open a ticket!</p>
             </>
           )}
           {step === 'done' && (
             <>
               <h1>You can now continue to the server!</h1>
-              <p className="subtitle">Welcome!</p>
+              <p className="subtitle">You can close this tab!</p>
             </>
           )}
-          {(step === 'ip' || step === 'discord') && (
+          {(step === 'ip' || step === 'working') && (
             <div className="dots">
               <span className="dot" />
               <span className="dot" />
@@ -52,7 +76,7 @@ function App() {
             </div>
           )}
           {step === 'failed' && (
-            <button className="retry-btn">Try again</button>
+            <button className="retry-btn" onClick={() => setStep('ip')}>Try again</button>
           )}
         </div>
       </div>
