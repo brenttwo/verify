@@ -137,6 +137,9 @@ function App() {
           )}
         </div>
       </div>
+      <p className="footer">
+        <a href="https://brenttwo.github.io/privacy/" className="footer-link">Privacy Policy</a>
+      </p>
     </>
   )
 }
