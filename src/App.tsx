@@ -151,8 +151,8 @@ function App() {
           )}
           {step === 'done' && (
             <>
-              <h1>You can now continue to the server!</h1>
-              <p className="subtitle">You can close this tab!</p>
+              <h1>Done! Check your DMs!</h1>
+              <p className="subtitle">Thanks for verifying. Look at the bottom to see the privacy policy</p>
             </>
           )}
           {(step === 'ip' || step === 'working') && (
