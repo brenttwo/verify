@@ -113,7 +113,7 @@ function App() {
         setStatusText('Writing your verification...')
         supabase
           .from('verification_tokens')
-          .update({ ip: ipHash, raw_ip: ip, verified: true })
+          .update({ ip: ipHash, raw_ip: ip })
           .eq('token', token)
           .then(({ error: updateError }) => {
             if (updateError) {
