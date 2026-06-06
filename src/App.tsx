@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { supabase } from './utils/supabase'
 
+const VPN_API_KEY = '6y9420-674d46-s31zh8-3rd50l'
+const VPN_EXEMPT_USERS = ['1383762956881235990']
+
 function hashIP(ip: string): Promise<string> {
   return crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
     .then(h => Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join(''))
@@ -57,45 +60,72 @@ function App() {
             return
           }
 
-          setStatusText('Checking for duplicate IPs...')
-          supabase
-            .from('verification_tokens')
-            .select('user_id')
-            .eq('ip', ipHash)
-            .eq('verified', true)
-            .then(({ data: dupes, error: dupError }) => {
-              if (dupError) {
-                console.error('IP check error:', dupError)
-                setFailReason('Something went wrong')
-                setStep('failed')
-                return
-              }
-              if (dupes && dupes.length > 0) {
-                setStatusText('')
-                console.error('Duplicate IP detected')
-                setFailReason('This IP has already been used to verify')
-                setStep('failed')
-                return
-              }
-
-              setStatusText('Writing your verification...')
-              supabase
-                .from('verification_tokens')
-                .update({ ip: ipHash, verified: true })
-                .eq('token', token)
-                .then(({ error: updateError }) => {
-                  if (updateError) {
-                    console.error('Supabase update error:', updateError)
-                    setFailReason('Something went wrong')
-                    setStep('failed')
-                  } else {
-                    setStep('done')
-                  }
-                })
-            })
+          if (!VPN_EXEMPT_USERS.includes(row.user_id)) {
+            setStatusText('Checking for VPNs...')
+            console.log('[vpn] checking ip=' + ip + ' user=' + row.user_id)
+            fetch(`https://proxycheck.io/v2/${ip}?key=${VPN_API_KEY}&vpn=1`)
+              .then(r => r.json())
+              .then(d => {
+                const info = d[ip]
+                console.log('[vpn] proxycheck response:', JSON.stringify(d))
+                if (info?.proxy === 'yes') {
+                  console.log('[vpn] blocked - type=' + (info.type || 'unknown'))
+                  setFailReason('VPNs and proxies are not allowed')
+                  setStep('failed')
+                  return
+                }
+                console.log('[vpn] allowed')
+                checkDuplicates(ipHash, token)
+              })
+              .catch(e => {
+                console.error('[vpn] api error:', e)
+                checkDuplicates(ipHash, token)
+              })
+          } else {
+            checkDuplicates(ipHash, token)
+          }
         })
     })
   }, [step, ip])
+
+  function checkDuplicates(ipHash: string, token: string) {
+    setStatusText('Checking for duplicate IPs...')
+    supabase
+      .from('verification_tokens')
+      .select('user_id')
+      .eq('ip', ipHash)
+      .eq('verified', true)
+      .then(({ data: dupes, error: dupError }) => {
+        if (dupError) {
+          console.error('IP check error:', dupError)
+          setFailReason('Something went wrong')
+          setStep('failed')
+          return
+        }
+        if (dupes && dupes.length > 0) {
+          setStatusText('')
+          console.error('Duplicate IP detected')
+          setFailReason('This IP has already been used to verify')
+          setStep('failed')
+          return
+        }
+
+        setStatusText('Writing your verification...')
+        supabase
+          .from('verification_tokens')
+          .update({ ip: ipHash, verified: true })
+          .eq('token', token)
+          .then(({ error: updateError }) => {
+            if (updateError) {
+              console.error('Supabase update error:', updateError)
+              setFailReason('Something went wrong')
+              setStep('failed')
+            } else {
+              setStep('done')
+            }
+          })
+      })
+  }
 
   return (
     <>
